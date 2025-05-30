@@ -12,7 +12,6 @@ const config: ThemeConfig = {
   useSystemColorMode: true,
 };
 
-// Updated with #ea5959 as primary
 const colors = {
   brand: {
     50: "#fde8e8",
@@ -20,7 +19,7 @@ const colors = {
     200: "#f59999",
     300: "#f17272",
     400: "#ee4b4b",
-    500: "#ea5959", // Primary color
+    500: "#ea5959",
     600: "#d84f4f",
     700: "#c64545",
     800: "#b43b3b",
