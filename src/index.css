@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  @apply bg-gray-50 text-gray-800 font-sans;
+}
+
+.task-checkbox:checked + .task-content {
+  @apply line-through opacity-70;
+}
+
+.priority-high {
+  @apply border-l-4 border-red-500;
+}
+
+.priority-medium {
+  @apply border-l-4 border-yellow-500;
+}
+
+.priority-low {
+  @apply border-l-4 border-green-500;
+}
+
+.toast {
+  animation: slideIn 0.5s, fadeOut 0.5s 3.5s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.sidebar {
+  transition: transform 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(-100%);
+    @apply fixed z-50 h-screen;
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  
+  .overlay {
+    @apply hidden fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50 z-40;
+  }
+  
+  .overlay.open {
+    @apply block;
+  }
+}
