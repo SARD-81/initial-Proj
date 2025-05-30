@@ -1,6 +1,14 @@
 import React from 'react';
-import { FaTasks, FaPlus, FaFolderPlus, FaInbox, FaTag, FaCheckCircle } from 'react-icons/fa';
+import { 
+  Box, Heading, Button, Text, 
+  Icon, useBreakpointValue, List, ListItem 
+} from '@chakra-ui/react';
+import { 
+  FaTasks, FaPlus, FaFolderPlus, 
+  FaInbox, FaTag, FaCheckCircle 
+} from 'react-icons/fa';
 import type { Category } from '../types/types';
+import { useDarkMode } from '../CustomChakraProvider';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -21,97 +29,165 @@ const Sidebar: React.FC<SidebarProps> = ({
   selectedCategory, 
   onSelectCategory 
 }) => {
-  return (
-    <div className={`sidebar bg-white w-64 border-r border-gray-200 flex flex-col ${isOpen ? 'open' : ''}`}>
-      <div className="p-4 border-b border-gray-200">
-        <h1 className="text-2xl font-bold text-indigo-600 flex items-center">
-          <FaTasks className="mr-2" aria-hidden="true" /> TaskMaster
-        </h1>
-      </div>
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const { isDark } = useDarkMode();
+  
+  const bgColor = isDark ? "gray.700" : "white";
+  const borderColor = isDark ? "gray.600" : "gray.200";
+  const textColor = isDark ? "gray.200" : "gray.700";
+  const hoverBg = isDark ? "gray.600" : "gray.100";
+  const selectedBg = isDark ? "brand.900" : "brand.50";
+  const selectedColor = isDark ? "brand.200" : "brand.600";
 
-      <div className="p-4 border-b border-gray-200">
-        <button
-          onClick={onAddTask}
-          className="w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 px-4 rounded-md flex items-center justify-center mb-2"
+  const handleCategorySelect = (id: string) => {
+    onSelectCategory(id);
+    if (isMobile) {
+      toggleSidebar();
+    }
+  };
+
+  return (
+    <Box
+      w="64"
+      borderRight="1px"
+      borderColor={borderColor}
+      flexDirection="column"
+      bg={bgColor}
+      display={isMobile ? (isOpen ? "flex" : "none") : "flex"}
+      position={isMobile ? "fixed" : "relative"}
+      zIndex={isMobile ? "modal" : "auto"}
+      h="100vh"
+      transform={isMobile ? (isOpen ? "translateX(0)" : "translateX(-100%)") : undefined}
+      transition="transform 0.3s ease"
+    >
+      <Box p="4" borderBottom="1px" borderColor={borderColor}>
+        <Heading as="h1" size="lg" color="brand.500" display="flex" alignItems="center">
+          <Icon as={FaTasks} mr="2" aria-hidden="true" /> TaskMaster
+        </Heading>
+      </Box>
+
+      <Box p="4" borderBottom="1px" borderColor={borderColor}>
+        <Button
+          onClick={() => {
+            onAddTask();
+            if (isMobile) toggleSidebar();
+          }}
+          w="full"
+          variant="outline"
+          colorScheme="brand"
+          mb="2"
+          leftIcon={<FaPlus />}
           aria-label="Add new task"
         >
-          <FaPlus className="mr-2" aria-hidden="true" /> Add Task
-        </button>
-        <button
-          onClick={onAddCategory}
-          className="w-full bg-white hover:bg-gray-100 text-indigo-600 border border-indigo-600 py-2 px-4 rounded-md flex items-center justify-center"
+          Add Task
+        </Button>
+        <Button
+          onClick={() => {
+            onAddCategory();
+            if (isMobile) toggleSidebar();
+          }}
+          w="full"
+          variant="outline"
+          colorScheme="brand"
+          leftIcon={<FaFolderPlus />}
           aria-label="Add new category"
         >
-          <FaFolderPlus className="mr-2" aria-hidden="true" /> Add Category
-        </button>
-      </div>
+          Add Category
+        </Button>
+      </Box>
 
-      <div className="flex-1 overflow-y-auto">
-        <div className="p-4">
-          <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+      <Box flex="1" overflowY="auto">
+        <Box p="4">
+          <Text 
+            fontSize="xs" 
+            fontWeight="semibold" 
+            color={isDark ? "gray.400" : "gray.500"} 
+            textTransform="uppercase" 
+            letterSpacing="wider" 
+            mb="2"
+          >
             Categories
-          </h3>
-          <ul className="space-y-1">
-            <li>
-              <button
-                onClick={() => onSelectCategory('all')}
-                className={`w-full text-left py-2 px-3 rounded-md hover:bg-gray-100 flex items-center ${
-                  selectedCategory === 'all' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'
-                }`}
+          </Text>
+          <List spacing="1">
+            <ListItem>
+              <Button
+                onClick={() => handleCategorySelect('all')}
+                w="full"
+                justifyContent="flex-start"
+                variant="ghost"
+                leftIcon={<FaInbox color="brand.500" />}
+                bg={selectedCategory === 'all' ? selectedBg : 'transparent'}
+                color={selectedCategory === 'all' ? selectedColor : textColor}
+                _hover={{ bg: hoverBg }}
                 aria-label="Show all tasks"
               >
-                <FaInbox className="mr-2 text-indigo-500" aria-hidden="true" /> All Tasks
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => onSelectCategory('uncategorized')}
-                className={`w-full text-left py-2 px-3 rounded-md hover:bg-gray-100 flex items-center ${
-                  selectedCategory === 'uncategorized' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'
-                }`}
+                All Tasks
+              </Button>
+            </ListItem>
+            <ListItem>
+              <Button
+                onClick={() => handleCategorySelect('uncategorized')}
+                w="full"
+                justifyContent="flex-start"
+                variant="ghost"
+                leftIcon={<FaTag color="gray.500" />}
+                bg={selectedCategory === 'uncategorized' ? selectedBg : 'transparent'}
+                color={selectedCategory === 'uncategorized' ? selectedColor : textColor}
+                _hover={{ bg: hoverBg }}
                 aria-label="Show uncategorized tasks"
               >
-                <FaTag className="mr-2 text-gray-500" aria-hidden="true" /> Uncategory
-              </button>
-            </li>
-            <li>
-              <button
-                onClick={() => onSelectCategory('completed')}
-                className={`w-full text-left py-2 px-3 rounded-md hover:bg-gray-100 flex items-center ${
-                  selectedCategory === 'completed' ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'
-                }`}
+                Uncategory
+              </Button>
+            </ListItem>
+            <ListItem>
+              <Button
+                onClick={() => handleCategorySelect('completed')}
+                w="full"
+                justifyContent="flex-start"
+                variant="ghost"
+                leftIcon={<FaCheckCircle color="green.500" />}
+                bg={selectedCategory === 'completed' ? selectedBg : 'transparent'}
+                color={selectedCategory === 'completed' ? selectedColor : textColor}
+                _hover={{ bg: hoverBg }}
                 aria-label="Show completed tasks"
               >
-                <FaCheckCircle className="mr-2 text-green-500" aria-hidden="true" /> Completed
-              </button>
-            </li>
+                Completed
+              </Button>
+            </ListItem>
             {categories.map(category => (
-              <li key={category.id}>
-                <button
-                  onClick={() => onSelectCategory(category.id)}
-                  className={`w-full text-left py-2 px-3 rounded-md hover:bg-gray-100 flex items-center ${
-                    selectedCategory === category.id ? 'bg-indigo-100 text-indigo-700' : 'text-gray-700'
-                  }`}
+              <ListItem key={category.id}>
+                <Button
+                  onClick={() => handleCategorySelect(category.id)}
+                  w="full"
+                  justifyContent="flex-start"
+                  variant="ghost"
+                  leftIcon={<FaTag color="brand.500" />}
+                  bg={selectedCategory === category.id ? selectedBg : 'transparent'}
+                  color={selectedCategory === category.id ? selectedColor : textColor}
+                  _hover={{ bg: hoverBg }}
                   aria-label={`Show tasks in ${category.name} category`}
                 >
-                  <FaTag className="mr-2 text-indigo-500" aria-hidden="true" /> {category.name}
-                </button>
-              </li>
+                  {category.name}
+                </Button>
+              </ListItem>
             ))}
-          </ul>
-        </div>
-      </div>
+          </List>
+        </Box>
+      </Box>
 
-      <div className="p-4 border-t border-gray-200 md:hidden">
-        <button
-          onClick={toggleSidebar}
-          className="w-full bg-gray-100 hover:bg-gray-200 text-gray-800 py-2 px-4 rounded-md"
-          aria-label="Close menu"
-        >
-          Close Menu
-        </button>
-      </div>
-    </div>
+      {isMobile && (
+        <Box p="4" borderTop="1px" borderColor={borderColor}>
+          <Button
+            onClick={toggleSidebar}
+            w="full"
+            variant="ghost"
+            colorScheme="gray"
+          >
+            Close Menu
+          </Button>
+        </Box>
+      )}
+    </Box>
   );
 };
 

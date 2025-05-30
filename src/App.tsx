@@ -1,30 +1,47 @@
 import React, { useState, useEffect } from 'react';
+import { 
+  Box, Flex, Input, 
+  useDisclosure, useBreakpointValue, IconButton, Badge, Tooltip, Icon
+} from '@chakra-ui/react';
+import { FaBars, FaSearch, FaMoon, FaSun } from 'react-icons/fa';
 import Sidebar from './components/Sidebar';
 import TaskList from './components/TaskList';
-import ToastNotification from './components/ToastNotification';
-import useLocalStorage from './hooks/useLocalStorage';
 import TaskForm from './components/TaskForm';
 import CategoryForm from './components/CategoryForm';
+import ToastNotification from './components/ToastNotification';
+import useLocalStorage from './hooks/useLocalStorage';
 import type { Task, Category } from './types/types';
+import { useDarkMode } from './CustomChakraProvider';
 
 const App: React.FC = () => {
   const [tasks, setTasks] = useLocalStorage<Task[]>('tasks', []);
   const [categories, setCategories] = useLocalStorage<Category[]>('categories', []);
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [showTaskForm, setShowTaskForm] = useState(false);
-  const [showCategoryForm, setShowCategoryForm] = useState(false);
   const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   
-  // Custom toast state
+  const { 
+    isOpen: isTaskFormOpen, 
+    onOpen: onTaskFormOpen, 
+    onClose: onTaskFormClose 
+  } = useDisclosure();
+  
+  const { 
+    isOpen: isCategoryFormOpen, 
+    onOpen: onCategoryFormOpen, 
+    onClose: onCategoryFormClose 
+  } = useDisclosure();
+  
   const [toast, setToast] = useState<{
     message: string;
     status: 'success' | 'error';
     visible: boolean;
   } | null>(null);
 
-  // Auto-hide toast after 4 seconds
+  const isMobile = useBreakpointValue({ base: true, md: false });
+  const { isDark, toggleDarkMode } = useDarkMode();
+
   useEffect(() => {
     if (toast?.visible) {
       const timer = setTimeout(() => {
@@ -34,7 +51,6 @@ const App: React.FC = () => {
     }
   }, [toast]);
 
-  // Filter tasks based on selected category and search query
   const filteredTasks = tasks.filter(task => {
     const matchesCategory = selectedCategory === 'completed' 
       ? task.isCompleted 
@@ -109,7 +125,7 @@ const App: React.FC = () => {
   };
 
   const toggleSidebar = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+    setSidebarOpen(!sidebarOpen);
   };
 
   const getCategoryName = () => {
@@ -122,74 +138,116 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen overflow-hidden bg-gray-50">
-      {/* Toast Notification */}
+    <Flex h="100vh" overflow="hidden" bg={isDark ? "gray.800" : "gray.50"}>
       {toast && (
-        <div className="fixed bottom-4 right-4 z-50">
+        <Box position="fixed" bottom="4" right="4" zIndex="toast">
           <ToastNotification 
             message={toast.message} 
             status={toast.status} 
             onClose={() => setToast(null)}
           />
-        </div>
+        </Box>
       )}
       
       <Sidebar
-        isOpen={isSidebarOpen}
+        isOpen={sidebarOpen}
         toggleSidebar={toggleSidebar}
         categories={categories}
-        onAddCategory={() => setShowCategoryForm(true)}
+        onAddCategory={onCategoryFormOpen}
         onAddTask={() => {
           setEditingTask(null);
-          setShowTaskForm(true);
+          onTaskFormOpen();
         }}
         onSelectCategory={setSelectedCategory}
         selectedCategory={selectedCategory}
       />
       
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top Bar */}
-        <div className="bg-white border-b border-gray-200 p-4 flex items-center justify-between">
-          <button 
-            onClick={toggleSidebar}
-            className="md:hidden text-gray-600"
-            aria-label="Toggle sidebar menu"
-          >
-            <i className="fas fa-bars text-xl" aria-hidden="true"></i>
-          </button>
-          <div className="flex-1 max-w-2xl mx-4">
-            <div className="relative">
-              <input
+      <Flex direction="column" flex="1" overflow="hidden">
+        <Flex 
+          bg={isDark ? "gray.700" : "white"}
+          borderBottom="1px"
+          borderColor={isDark ? "gray.600" : "gray.200"}
+          p="4" 
+          align="center" 
+          justify="space-between"
+        >
+          {isMobile && (
+            <IconButton
+              aria-label="Toggle sidebar"
+              icon={<FaBars />}
+              variant="ghost"
+              onClick={toggleSidebar}
+              color={isDark ? "white" : "gray.600"}
+              fontSize="xl"
+            />
+          )}
+          
+          <Box flex="1" maxW="2xl" mx="4">
+            <Box position="relative">
+              <Input
                 type="text"
                 placeholder="Search tasks..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                pl="10"
+                bg={isDark ? "gray.600" : "white"}
+                borderColor={isDark ? "gray.600" : "gray.200"}
+                color={isDark ? "white" : "gray.800"}
+                _hover={{ borderColor: isDark ? "gray.500" : "gray.300" }}
+                _focus={{ 
+                  borderColor: "brand.500",
+                  boxShadow: "0 0 0 1px var(--chakra-colors-brand-500)"
+                }}
                 aria-label="Search tasks"
               />
-              <i 
-                className="fas fa-search absolute left-3 top-3 text-gray-400" 
-                aria-hidden="true"
-              ></i>
-            </div>
-          </div>
-          <div className="flex items-center">
-            <div 
-              className="hidden md:block text-sm font-medium text-gray-700 bg-gray-100 px-3 py-1 rounded-md"
-              aria-live="polite"
-            >
-              {getCategoryName()}
-            </div>
-          </div>
-        </div>
+              <Icon 
+                as={FaSearch} 
+                position="absolute" 
+                left="3" 
+                top="50%" 
+                transform="translateY(-50%)" 
+                color={isDark ? "gray.400" : "gray.400"}
+              />
+            </Box>
+          </Box>
+          
+          <Flex align="center" gap={3}>
+            <Tooltip label={isDark ? "Switch to light mode" : "Switch to dark mode"}>
+              <IconButton
+                aria-label="Toggle dark mode"
+                icon={isDark ? <FaSun /> : <FaMoon />}
+                variant="ghost"
+                onClick={toggleDarkMode}
+                color={isDark ? "brand.200" : "brand.500"}
+              />
+            </Tooltip>
+            
+            <Box display={{ base: 'none', md: 'block' }}>
+              <Badge 
+                colorScheme="brand"
+                fontSize="sm"
+                fontWeight="medium"
+                px="3" 
+                py="1" 
+                borderRadius="md"
+              >
+                {getCategoryName()}
+              </Badge>
+            </Box>
+          </Flex>
+        </Flex>
         
-        {/* Main Content */}
-        <div className="flex-1 overflow-y-auto p-4 bg-gray-50">
+        <Box 
+          flex="1" 
+          overflowY="auto" 
+          p="4" 
+          bg={isDark ? "gray.800" : "gray.50"}
+        >
           <TaskList
             tasks={filteredTasks}
             onEditTask={(task) => {
               setEditingTask(task);
-              setShowTaskForm(true);
+              onTaskFormOpen();
             }}
             onDeleteTask={handleDeleteTask}
             onToggleComplete={(taskId) => {
@@ -199,13 +257,13 @@ const App: React.FC = () => {
               }
             }}
           />
-        </div>
-      </div>
+        </Box>
+      </Flex>
       
       <TaskForm
-        isOpen={showTaskForm}
+        isOpen={isTaskFormOpen}
         onClose={() => {
-          setShowTaskForm(false);
+          onTaskFormClose();
           setEditingTask(null);
         }}
         onSubmit={(taskData: Omit<Task, 'id' | 'createdAt' | 'updatedAt' | 'isCompleted'>) => 
@@ -218,20 +276,24 @@ const App: React.FC = () => {
       />
       
       <CategoryForm
-        isOpen={showCategoryForm}
-        onClose={() => setShowCategoryForm(false)}
+        isOpen={isCategoryFormOpen}
+        onClose={onCategoryFormClose}
         onSubmit={handleAddCategory}
       />
       
-      {/* Mobile Overlay */}
-      {isSidebarOpen && (
-        <div 
-          className="overlay open md:hidden" 
+      {isMobile && sidebarOpen && (
+        <Box 
+          position="fixed"
+          top="0"
+          left="0"
+          right="0"
+          bottom="0"
+          bg="blackAlpha.600"
+          zIndex="overlay"
           onClick={toggleSidebar}
-          aria-hidden="true"
         />
       )}
-    </div>
+    </Flex>
   );
 };
 

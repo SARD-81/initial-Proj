@@ -1,6 +1,7 @@
 import React from 'react';
 import TaskItem from './TaskItem';
 import type { Task } from '../types/types';
+import { Box, Text, useColorMode, VStack } from '@chakra-ui/react';
 
 interface TaskListProps {
   tasks: Task[];
@@ -15,20 +16,45 @@ const TaskList: React.FC<TaskListProps> = ({
   onDeleteTask,
   onToggleComplete 
 }) => {
+  const { colorMode } = useColorMode();
+  const isDark = colorMode === 'dark';
+  
   if (tasks.length === 0) {
     return (
-      <div className="text-center py-12 max-w-3xl mx-auto">
-        <div className="bg-gray-200 border-2 border-dashed rounded-xl w-16 h-16 mx-auto mb-4 flex items-center justify-center">
-          <i className="fas fa-tasks text-2xl text-gray-400"></i>
-        </div>
-        <h3 className="text-lg font-medium text-gray-700 mb-1">No tasks found</h3>
-        <p className="text-gray-500">Create a new task to get started</p>
-      </div>
+      <Box textAlign="center" py="12" maxW="3xl" mx="auto">
+        <Box 
+          bg={isDark ? "gray.600" : "gray.200"} 
+          border="2px" 
+          borderStyle="dashed" 
+          borderRadius="xl" 
+          w="16" 
+          h="16" 
+          mx="auto" 
+          mb="4" 
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+        >
+          <Box 
+            as="i" 
+            className="fas fa-tasks" 
+            fontSize="2xl" 
+            color={isDark ? "gray.400" : "gray.400"}
+            aria-hidden="true"
+          ></Box>
+        </Box>
+        <Text fontSize="lg" fontWeight="medium" color={isDark ? "gray.300" : "gray.700"} mb="1">
+          No tasks found
+        </Text>
+        <Text color={isDark ? "gray.500" : "gray.500"}>
+          Create a new task to get started
+        </Text>
+      </Box>
     );
   }
 
   return (
-    <div className="space-y-4 max-w-3xl mx-auto">
+    <VStack spacing={3} maxW="3xl" mx="auto" align="stretch">
       {tasks.map(task => (
         <TaskItem
           key={task.id}
@@ -38,7 +64,7 @@ const TaskList: React.FC<TaskListProps> = ({
           onToggleComplete={() => onToggleComplete(task.id)}
         />
       ))}
-    </div>
+    </VStack>
   );
 };
 

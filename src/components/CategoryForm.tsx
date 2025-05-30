@@ -1,17 +1,9 @@
 import React, { useState } from 'react';
 import { 
-  Button, 
-  Input 
+  Button, Input, 
+  Modal, ModalOverlay, ModalContent,
+  ModalHeader, ModalCloseButton, ModalBody, ModalFooter
 } from '@chakra-ui/react';
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter
-} from '@chakra-ui/modal';
 
 interface CategoryFormProps {
   isOpen: boolean;
@@ -49,7 +41,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ isOpen, onClose, onSubmit }
             Cancel
           </Button>
           <Button 
-            colorScheme="blue" 
+            colorScheme="brand" 
             onClick={handleSubmit} 
             disabled={!name.trim()}
           >

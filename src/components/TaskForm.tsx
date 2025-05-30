@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { Button, Input, Textarea, Box } from "@chakra-ui/react";
-import { FormControl, FormLabel } from "@chakra-ui/form-control";
-import { Select } from "@chakra-ui/select";
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalFooter,
-} from "@chakra-ui/modal";
-import { CloseButton } from "@chakra-ui/close-button";
+import { 
+  Button, Input, Textarea, 
+  FormControl, FormLabel, Select, 
+  Modal, ModalOverlay, ModalContent, 
+  ModalHeader, ModalBody, ModalFooter, 
+  ModalCloseButton, Grid 
+} from "@chakra-ui/react";
 import type { Task, Category } from "../types/types";
 
 interface TaskFormProps {
@@ -39,7 +34,6 @@ const TaskForm: React.FC<TaskFormProps> = ({
     initialValues?.priority || "medium"
   );
 
-  // Reset form state whenever the modal opens or initialValues change
   useEffect(() => {
     if (isOpen) {
       setTitle(initialValues?.title || "");
@@ -66,55 +60,40 @@ const TaskForm: React.FC<TaskFormProps> = ({
         <ModalHeader>
           {initialValues?.id ? "Edit Task" : "Add New Task"}
         </ModalHeader>
-        <CloseButton
-          onClick={onClose}
-          position="absolute"
-          top="8px"
-          right="8px"
-          aria-label="Close modal"
-        />
-        <ModalBody className="space-y-4">
-          <FormControl isRequired>
-            <FormLabel htmlFor="titleInput">Title</FormLabel>
+        <ModalCloseButton aria-label="Close modal" />
+        <ModalBody>
+          <FormControl isRequired mb={4}>
+            <FormLabel htmlFor="task-title">Title</FormLabel>
             <Input
-              id="titleInput"
+              id="task-title"
               value={title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                setTitle(e.target.value)
-              }
+              onChange={(e) => setTitle(e.target.value)}
               placeholder="Task title"
-              aria-required="true"
+              aria-label="Task title"
             />
           </FormControl>
 
-          <FormControl>
-            <FormLabel htmlFor="descriptionTextarea">Description</FormLabel>
+          <FormControl mb={4}>
+            <FormLabel htmlFor="task-description">Description</FormLabel>
             <Textarea
-              id="descriptionTextarea"
+              id="task-description"
               value={description}
-              onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                setDescription(e.target.value)
-              }
+              onChange={(e) => setDescription(e.target.value)}
               placeholder="Task description"
               rows={3}
+              aria-label="Task description"
             />
           </FormControl>
 
-          <Box display="grid" gridTemplateColumns="1fr 1fr" gap={4}>
+          <Grid templateColumns="repeat(2, 1fr)" gap={4}>
             <FormControl>
-              <FormLabel id="category-label" htmlFor="categorySelect">
-                Category
-              </FormLabel>
+              <FormLabel htmlFor="task-category">Category</FormLabel>
               <Select
-                id="categorySelect"
+                id="task-category"
                 value={category}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setCategory(e.target.value)
-                }
-                aria-labelledby="category-label"
-                aria-label="Task category"
-                title="Select task category"
+                onChange={(e) => setCategory(e.target.value)}
                 placeholder="Uncategorized"
+                aria-label="Task category"
               >
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.name}>
@@ -125,25 +104,19 @@ const TaskForm: React.FC<TaskFormProps> = ({
             </FormControl>
 
             <FormControl>
-              <FormLabel id="priority-label" htmlFor="prioritySelect">
-                Priority
-              </FormLabel>
+              <FormLabel htmlFor="task-priority">Priority</FormLabel>
               <Select
-                id="prioritySelect"
+                id="task-priority"
                 value={priority}
-                onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                  setPriority(e.target.value as Task["priority"])
-                }
-                aria-labelledby="priority-label"
+                onChange={(e) => setPriority(e.target.value as Task["priority"])}
                 aria-label="Task priority"
-                title="Select task priority"
               >
                 <option value="high">High</option>
                 <option value="medium">Medium</option>
                 <option value="low">Low</option>
               </Select>
             </FormControl>
-          </Box>
+          </Grid>
         </ModalBody>
 
         <ModalFooter>
@@ -151,10 +124,10 @@ const TaskForm: React.FC<TaskFormProps> = ({
             Cancel
           </Button>
           <Button
-            colorScheme="blue"
+            colorScheme="brand"
+            variant="ghost"
             onClick={handleSubmit}
-            disabled={!title.trim()}
-            aria-disabled={!title.trim()}
+            isDisabled={!title.trim()}
           >
             {initialValues?.id ? "Update Task" : "Add Task"}
           </Button>
