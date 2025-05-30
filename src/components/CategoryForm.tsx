@@ -42,6 +42,7 @@ const CategoryForm: React.FC<CategoryFormProps> = ({ isOpen, onClose, onSubmit }
           </Button>
           <Button 
             colorScheme="brand" 
+            variant="ghost"
             onClick={handleSubmit} 
             disabled={!name.trim()}
           >
