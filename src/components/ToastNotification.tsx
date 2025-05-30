@@ -1,4 +1,3 @@
-// components/ToastNotification.tsx
 import React from 'react';
 import { FiCheckCircle, FiXCircle, FiX } from 'react-icons/fi';
 

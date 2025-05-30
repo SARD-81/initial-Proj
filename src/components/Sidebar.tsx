@@ -1,4 +1,3 @@
-// components/Sidebar.tsx
 import React from 'react';
 import { FaTasks, FaPlus, FaFolderPlus, FaInbox, FaTag, FaCheckCircle } from 'react-icons/fa';
 import type { Category } from '../types/types';

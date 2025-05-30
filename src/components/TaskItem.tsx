@@ -1,4 +1,3 @@
-// components/TaskItem.tsx
 import React from 'react';
 import { FiEdit2, FiTrash2, FiCheck } from 'react-icons/fi';
 import PriorityBadge from './PriorityBadge';
